@@ -10,7 +10,7 @@ import os
 
 def runner():
     today = (today.date())
-    api_key = ' '
+    api_key = ''
     base_url = "https://newsapi.org/v2/everything?q={}&from={}&to={}&sortBy=popularity&apiKey={}&language=en"
     print(base_url)
     start_date_value = str(today - datetime.timedelta(days = 1))
@@ -22,14 +22,14 @@ def runner():
     response = requests.get(url_extractor)
     d = response.json()
 
-    for i in d['articles']:
-        newsTitle = i['Title']
-        timestamp = i['PublishedAt']
-        trimmed_part = "None"
-        url_source = i['url']
-        source = i['source']
-        author = i['author']
-        urlToImage = i['urlToImage']
+    for i in d.get('articles', []):  
+        newsTitle = i.get('Title', '')
+        timestamp = i.get('publishedAt', '')
+        url_source = i.get('url', '')
+        source = i.get('source', {}).get('name', '')
+        author = i.get('author', '')
+        urlToImage = i.get('urlToImage', '')
+        partial_content = i.get('content', '')
         partial_content = ""
         if (str(i['content']) != "None"):
             partial_content = i['content']
@@ -44,7 +44,7 @@ def runner():
         'source': source, 'author': author, 'urlToImage': urlToImage})], ignore_index = True)
     
     filename = str(uuid.uuid4())
-    output_file = "\Users\Amisha\news_etl_pipeline\{}.parquet".format(filename)
+    output_file = "\\Users\\Amisha\\news_etl_pipeline\\{}.parquet".format(filename)
     df1 = df.drop_duplicates()
     df1.to_parquet(output_file)
     return output_file
