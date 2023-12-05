@@ -6,7 +6,7 @@ from airflow.providers.snowflake.hooks.snowflake import SnowflakeHook
 from airflow.operators.bash import BashOperator
 from datetime import datetime, timedelta
 from news_fetcher import runner
-
+from s3_store import extract_and_stage_to_s3
 
 default_args = {
     'owner' : 'vishal',
@@ -27,9 +27,9 @@ with DAG(
         dag = dag
     )
 
-    move_file_to_s3 = BashOperator(
-        task_id = 'move_file_to_s3',
-        bash_command = 'aws s3 mv {{ti.xcom_pull("extract_news_info)}} s3://newsetldata'
+    stage_to_s3_task = PythonOperator(
+        task_id='stage_to_s3_task',
+        python_callable=extract_and_stage_to_s3
     )
 
     snowflake_create_table = SnowflakeOperator(
@@ -44,4 +44,4 @@ with DAG(
         snowflake_conn_id = 'snowflake_conn'
     )
 
-extract_news_info >> move_file_to_s3 >> snowflake_create_table >> snowflake_copy
+extract_news_info >> stage_to_s3_task >> snowflake_create_table >> snowflake_copy
