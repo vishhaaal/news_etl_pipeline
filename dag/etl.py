@@ -5,8 +5,8 @@ from airflow.providers.snowflake.operators.snowflake import SnowflakeOperator
 from airflow.providers.snowflake.hooks.snowflake import SnowflakeHook
 from airflow.operators.bash import BashOperator
 from datetime import datetime, timedelta
-import sys
-sys.path.insert(0, '\\Users\\Amisha\\news_etl_pipeline')  
+# import sys
+# sys.path.insert(0, '\\Users\\Amisha\\news_etl_pipeline')  
 from news_fetcher import runner
 
 
